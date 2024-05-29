@@ -1,0 +1,293 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String"
+        },
+        "vmssName": {
+            "type": "String"
+        },
+        "loadBalancerName": {
+            "type": "String"
+        },
+        "identityName": {
+            "type": "String"
+        },
+        "subnetId": {
+            "type": "String"
+        },
+        "userData": {
+            "type": "String"
+        },
+        "script": {
+            "type": "String"
+        },
+        "revision": {
+            "defaultValue": 1,
+            "type": "int"
+        }
+    },
+    "variables": {
+        "frontendConfigName": "port80",
+        "frontendConfigId": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', parameters('loadBalancerName'), variables('frontendConfigName'))]",
+        "backendPool": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancerName'), parameters('vmssName'))]",
+        "adminUsername": "azureuser",
+        "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDPmKfiFdqqzMUUpJfCwmWomFb+bSubxuAyXWFmfituwLOT4V/uE8NX98wnyTENxJh1IfY820x/OLjaW5dKgv06VYcnlgwRhF7NZZw61G1ovwkZh9DybI3uzSLYxXqgiXa2xcVtfEDo1hZdKq1mFRcWr2Q09AuUEG/I/rgwsIeq0gKuO0PrP5UIry4km3Y9yDmgsWXDkPaMI4UUDYKtchGdAZ9C0lBHEeK8jEvc/8eQj2u+X8ogGr2lAqSX1h0vS1N24ilKdNyy0d5Do/ReyikTIO193im8USHJyKO9usfd6/KjxHF1UKKUl3wnmX/tsEp9Otsuls0Xlk5kM3go53eDvtMrhnqZ1YpGHZC+uCGdNFl9h7F9kUHJ3xSLu7iOv2XDwj03CivL+uGb6fH425bjzrs1SEAjnozhUIYSpzQy8TYo6ceza82HGrPOp/ACCcZ5o2txoAf08VPyMTFjQYUFajU9MVOB492mMu0K2eTf63tpsQJA6lYS0nt68Un1oxk= generated-by-azure"                       
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2023-01-31",
+            "name": "[parameters('identityName')]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "apiVersion": "2021-05-01",
+            "name": "[parameters('loadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[variables('frontendConfigName')]",
+                        "properties": {
+                            "privateIPAddressVersion": "IPv4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('subnetId')]"
+                            }
+                        },
+                        "zones": [
+                            "3",
+                            "1",
+                            "2"
+                        ]
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[parameters('vmssName')]"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "probe-http80",
+                        "properties": {
+                            "protocol": "HTTP",
+                            "port": 80,
+                            "requestPath": "/",
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 1
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "rule-port80-vmss",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('frontendConfigId')]"
+                            },
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "TCP",
+                            "loadDistribution": "Default",
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', parameters('loadBalancerName'), 'probe-http80')]"
+                            },
+                            "disableOutboundSnat": true,
+                            "enableTcpReset": false,
+                            "backendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancerName'), parameters('vmssName'))]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "outboundRules": []
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2024-03-01",
+            "name": "[parameters('vmssName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancerName'))]"
+            ],
+            "sku": {
+                "name": "Standard_D2ads_v5",
+                "tier": "Standard",
+                "capacity": 3
+            },
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName'))]": {}
+                }
+            },
+            "properties": {
+                "singlePlacementGroup": false,
+                "orchestrationMode": "Uniform",
+                "upgradePolicy": {
+                    "mode": "Rolling",
+                    "automaticOSUpgradePolicy": {
+                        "enableAutomaticOSUpgrade": true
+                    }
+                },
+                "scaleInPolicy": {
+                    "rules": [
+                        "Default"
+                    ],
+                    "forceDeletion": false
+                },
+                "virtualMachineProfile": {
+                    "userData": "[parameters('userData')]",
+                    "osProfile": {
+                        "computerNamePrefix": "[parameters('vmssName')]",
+                        "adminUsername": "[variables('adminUsername')]",
+                        "linuxConfiguration": {
+                            "disablePasswordAuthentication": true,
+                            "ssh": {
+                                "publicKeys": [
+                                    {
+                                        "path": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
+                                        "keyData": "[variables('sshKeyData')]"
+                                    }
+                                ]
+                            },
+                            "provisionVMAgent": true,
+                            "patchSettings": {
+                                "patchMode": "ImageDefault",
+                                "assessmentMode": "ImageDefault"
+                            }
+                        },
+                        "secrets": [],
+                        "allowExtensionOperations": true
+                    },
+                    "storageProfile": {
+                        "osDisk": {
+                            "osType": "Linux",
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            },
+                            "diskSizeGB": 5
+                        },
+                        "imageReference": {
+                            "sharedGalleryImageId": "/SharedGalleries/CblMariner.1P/Images/cbl-mariner-2-gen2/Versions/latest"
+                        },
+                        "diskControllerType": "SCSI"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[concat('nic-', parameters('vmssName'), '-', parameters('location'), '-01')]",
+                                "properties": {
+                                    "primary": true,
+                                    "enableAcceleratedNetworking": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "primary",
+                                            "properties": {
+                                                "privateIPAddressVersion": "IPv4",
+                                                "subnet": {
+                                                    "id": "[parameters('subnetId')]"
+                                                },
+                                                "primary": true,
+                                                "applicationSecurityGroups": [],
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[variables('backendPool')]"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "healthProbe": {
+                            "id": "[resourceId('Microsoft.Network/loadBalancers/probes', parameters('loadBalancerName'), 'probe-http80')]"
+                        }
+                    },
+                    "diagnosticsProfile": {
+                        "bootDiagnostics": {
+                            "enabled": true
+                        }
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "Microsoft.Azure.Security.Monitoring.AzureSecurityLinuxAgent",
+                                "properties": {
+                                    "publisher": "Microsoft.Azure.Security.Monitoring",
+                                    "type": "AzureSecurityLinuxAgent",
+                                    "typeHandlerVersion": "2.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "enableAutomaticUpgrade": true,
+                                    "suppressFailures": true,
+                                    "settings": {
+                                        "enableGenevaUpload": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Microsoft.Azure.Monitor.AzureMonitorLinuxAgent",
+                                "properties": {
+                                    "publisher": "Microsoft.Azure.Monitor",
+                                    "type": "AzureMonitorLinuxAgent",
+                                    "typeHandlerVersion": "1.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "enableAutomaticUpgrade": true,
+                                    "suppressFailures": true,
+                                    "settings": {
+                                        "GCS_AUTO_CONFIG": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Nginx",
+                                "properties": {
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.1",
+                                    "autoUpgradeMinorVersion": true,
+                                    "enableAutomaticUpgrade": false,
+                                    "suppressFailures": false,
+                                    "settings": {
+                                        "timestamp": "[parameters('revision')]"
+                                    },
+                                    "protectedSettings": {
+                                        "script": "[parameters('script')]"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "securityProfile": {
+                        "uefiSettings": {
+                            "secureBootEnabled": true,
+                            "vTpmEnabled": true
+                        },
+                        "securityType": "TrustedLaunch"
+                    }
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "platformFaultDomainCount": 1
+            }
+        }
+    ]
+}

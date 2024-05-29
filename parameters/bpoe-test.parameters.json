@@ -11,6 +11,15 @@
         "loadBalancerName": {
             "value": "lb-bpoe-test-westus2-01"
         },
+        "loadBalancerIp": {
+            "value": "10.0.1.254"
+        },
+        "nsgName": {
+            "value": "nsg-bpoe-test-westus2-01"
+        },
+        "allowedSourceAddressPrefix": {
+            "value": "10.0.0.4"
+        },
         "identityname": {
             "value": "id-bpoe-test-westus2-01"
         },

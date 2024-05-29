@@ -12,6 +12,16 @@
         "loadBalancerName": {
             "type": "String"
         },
+        "loadBalancerIp": {
+            "defaultValue": "10.0.1.5",
+            "type": "String"
+        },
+        "nsgName":{
+            "type": "String"
+        },
+        "allowedSourceAddressPrefix": {
+            "type": "String"
+        },
         "identityName": {
             "type": "String"
         },
@@ -58,7 +68,8 @@
                         "name": "[variables('frontendConfigName')]",
                         "properties": {
                             "privateIPAddressVersion": "IPv4",
-                            "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('loadBalancerIp')]",
                             "subnet": {
                                 "id": "[parameters('subnetId')]"
                             }
@@ -117,12 +128,79 @@
             }
         },
         {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-04-01",
+            "name": "[parameters('nsgName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow-IPRange-HTTPInbound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "[parameters('allowedSourceAddressPrefix')]",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Allow-AzureLoadBalancer-HTTPInbound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "AzureLoadBalancer",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyVnetInbound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 201,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2024-03-01",
             "name": "[parameters('vmssName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancerName'))]"
+                "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancerName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName'))]"
             ],
             "sku": {
                 "name": "Standard_D2ads_v5",
@@ -195,6 +273,9 @@
                                 "name": "[concat('nic-', parameters('vmssName'), '-', parameters('location'), '-01')]",
                                 "properties": {
                                     "primary": true,
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+                                    },
                                     "enableAcceleratedNetworking": true,
                                     "ipConfigurations": [
                                         {

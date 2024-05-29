@@ -1,39 +1,39 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "value": "westus2"
-        },
-        "vmssName": {
-            "value": "vmss-bpoe-test-westus2-01"
-        },
-        "loadBalancerName": {
-            "value": "lb-bpoe-test-westus2-01"
-        },
-        "loadBalancerIp": {
-            "value": "10.0.1.254"
-        },
-        "nsgName": {
-            "value": "nsg-bpoe-test-westus2-01"
-        },
-        "allowedSourceAddressPrefix": {
-            "value": "10.0.0.4"
-        },
-        "identityname": {
-            "value": "id-bpoe-test-westus2-01"
-        },
-        "subnetId": {
-            "value":"/subscriptions/0fff0b88-539a-4eda-86e4-d507bfdd8928/resourceGroups/bpoe/providers/Microsoft.Network/virtualNetworks/vnet-bpoe-test-westus2-01/subnets/default2"
-        },
-        "userData": {
-            "value": "DQojdXNlciAgbm9ib2R5Ow0Kd29ya2VyX3Byb2Nlc3NlcyAgMTsNCg0KI2Vycm9yX2xvZyAgbG9ncy9lcnJvci5sb2c7DQojZXJyb3JfbG9nICBsb2dzL2Vycm9yLmxvZyAgbm90aWNlOw0KI2Vycm9yX2xvZyAgbG9ncy9lcnJvci5sb2cgIGluZm87DQoNCiNwaWQgICAgICAgIGxvZ3MvbmdpbngucGlkOw0KDQoNCmV2ZW50cyB7DQogICAgd29ya2VyX2Nvbm5lY3Rpb25zICAxMDI0Ow0KfQ0KDQoNCmh0dHAgew0KICAgIGluY2x1ZGUgICAgICAgbWltZS50eXBlczsNCiAgICBkZWZhdWx0X3R5cGUgIGFwcGxpY2F0aW9uL29jdGV0LXN0cmVhbTsNCg0KICAgICNsb2dfZm9ybWF0ICBtYWluICAnJHJlbW90ZV9hZGRyIC0gJHJlbW90ZV91c2VyIFskdGltZV9sb2NhbF0gIiRyZXF1ZXN0IiAnDQogICAgIyAgICAgICAgICAgICAgICAgICckc3RhdHVzICRib2R5X2J5dGVzX3NlbnQgIiRodHRwX3JlZmVyZXIiICcNCiAgICAjICAgICAgICAgICAgICAgICAgJyIkaHR0cF91c2VyX2FnZW50IiAiJGh0dHBfeF9mb3J3YXJkZWRfZm9yIic7DQoNCiAgICAjYWNjZXNzX2xvZyAgbG9ncy9hY2Nlc3MubG9nICBtYWluOw0KDQogICAgc2VuZGZpbGUgICAgICAgIG9uOw0KICAgICN0Y3Bfbm9wdXNoICAgICBvbjsNCg0KICAgICNrZWVwYWxpdmVfdGltZW91dCAgMDsNCiAgICBrZWVwYWxpdmVfdGltZW91dCAgNjU7DQoNCiAgICAjZ3ppcCAgb247DQoNCiAgICBzZXJ2ZXIgew0KICAgICAgICBsaXN0ZW4gICAgICAgODA7DQogICAgICAgIHNlcnZlcl9uYW1lICBsb2NhbGhvc3Q7DQoNCiAgICAgICAgI2NoYXJzZXQga29pOC1yOw0KDQogICAgICAgICNhY2Nlc3NfbG9nICBsb2dzL2hvc3QuYWNjZXNzLmxvZyAgbWFpbjsNCg0KICAgICAgICBsb2NhdGlvbiAvbWV0YWRhdGEgew0KICAgICAgICAgICAgcHJveHlfcGFzcyBodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhOw0KICAgICAgICB9DQoNCiAgICAgICAgbG9jYXRpb24gLyB7DQogICAgICAgICAgICByb290ICAgaHRtbDsNCiAgICAgICAgICAgIGluZGV4ICBpbmRleC5odG1sIGluZGV4Lmh0bTsNCiAgICAgICAgfQ0KDQogICAgICAgICNlcnJvcl9wYWdlICA0MDQgICAgICAgICAgICAgIC80MDQuaHRtbDsNCg0KICAgICAgICAjIHJlZGlyZWN0IHNlcnZlciBlcnJvciBwYWdlcyB0byB0aGUgc3RhdGljIHBhZ2UgLzUweC5odG1sDQogICAgICAgICMNCiAgICAgICAgZXJyb3JfcGFnZSAgIDUwMCA1MDIgNTAzIDUwNCAgLzUweC5odG1sOw0KICAgICAgICBsb2NhdGlvbiA9IC81MHguaHRtbCB7DQogICAgICAgICAgICByb290ICAgaHRtbDsNCiAgICAgICAgfQ0KDQogICAgfQ0KDQp9"
-        },
-        "script": {
-            "value": "IyEvYmluL3NoDQoNCmN1cmwgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlL2NvbXB1dGUvdXNlckRhdGE/YXBpLXZlcnNpb249MjAyMS0wMS0wMSZmb3JtYXQ9dGV4dCIgfCBiYXNlNjQgLS1kZWNvZGUgPiBuZ2lueC5jb25mDQoNCnN1ZG8gc3lzdGVtY3RsIHN0b3AgbmdpbngNCg0Kc3VkbyBkbmYgaW5zdGFsbCBuZ2lueCAteQ0KDQpzdWRvIGNwIG5naW54LmNvbmYgL2V0Yy9uZ2lueC9uZ2lueC5jb25mDQoNCnN1ZG8gc3lzdGVtY3RsIGVuYWJsZSBuZ2lueA0Kc3VkbyBzeXN0ZW1jdGwgc3RhcnQgbmdpbngNCnN1ZG8gaXB0YWJsZXMgLUEgSU5QVVQgLXAgdGNwIC0tZHBvcnQgODAgLW0gY29ubnRyYWNrIC0tY3RzdGF0ZSBORVcsRVNUQUJMSVNIRUQgLWogQUNDRVBUDQpzdWRvIGlwdGFibGVzIC1BIE9VVFBVVCAtcCB0Y3AgLS1zcG9ydCA4MCAtbSBjb25udHJhY2sgLS1jdHN0YXRlIEVTVEFCTElTSEVEIC1qIEFDQ0VQVA0K"
-        },
-        "revision": {
-            "value": 4
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westus2"
+    },
+    "vmssName": {
+      "value": "vmss-bpoe-test-westus2-01"
+    },
+    "loadBalancerName": {
+      "value": "lb-bpoe-test-westus2-01"
+    },
+    "loadBalancerIp": {
+      "value": "10.0.1.254"
+    },
+    "nsgName": {
+      "value": "nsg-bpoe-test-westus2-01"
+    },
+    "allowedSourceAddressPrefix": {
+      "value": "10.0.0.4"
+    },
+    "identityname": {
+      "value": "id-bpoe-test-westus2-01"
+    },
+    "subnetId": {
+      "value": "/subscriptions/0fff0b88-539a-4eda-86e4-d507bfdd8928/resourceGroups/bpoe/providers/Microsoft.Network/virtualNetworks/vnet-bpoe-test-westus2-01/subnets/default2"
+    },
+    "userData": {
+      "value": "DQojdXNlciAgbm9ib2R5Ow0Kd29ya2VyX3Byb2Nlc3NlcyAgMTsNCg0KI2Vycm9yX2xvZyAgbG9ncy9lcnJvci5sb2c7DQojZXJyb3JfbG9nICBsb2dzL2Vycm9yLmxvZyAgbm90aWNlOw0KI2Vycm9yX2xvZyAgbG9ncy9lcnJvci5sb2cgIGluZm87DQoNCiNwaWQgICAgICAgIGxvZ3MvbmdpbngucGlkOw0KDQoNCmV2ZW50cyB7DQogICAgd29ya2VyX2Nvbm5lY3Rpb25zICAxMDI0Ow0KfQ0KDQoNCmh0dHAgew0KICAgIGluY2x1ZGUgICAgICAgbWltZS50eXBlczsNCiAgICBkZWZhdWx0X3R5cGUgIGFwcGxpY2F0aW9uL29jdGV0LXN0cmVhbTsNCg0KICAgICNsb2dfZm9ybWF0ICBtYWluICAnJHJlbW90ZV9hZGRyIC0gJHJlbW90ZV91c2VyIFskdGltZV9sb2NhbF0gIiRyZXF1ZXN0IiAnDQogICAgIyAgICAgICAgICAgICAgICAgICckc3RhdHVzICRib2R5X2J5dGVzX3NlbnQgIiRodHRwX3JlZmVyZXIiICcNCiAgICAjICAgICAgICAgICAgICAgICAgJyIkaHR0cF91c2VyX2FnZW50IiAiJGh0dHBfeF9mb3J3YXJkZWRfZm9yIic7DQoNCiAgICAjYWNjZXNzX2xvZyAgbG9ncy9hY2Nlc3MubG9nICBtYWluOw0KDQogICAgc2VuZGZpbGUgICAgICAgIG9uOw0KICAgICN0Y3Bfbm9wdXNoICAgICBvbjsNCg0KICAgICNrZWVwYWxpdmVfdGltZW91dCAgMDsNCiAgICBrZWVwYWxpdmVfdGltZW91dCAgNjU7DQoNCiAgICAjZ3ppcCAgb247DQoNCiAgICBzZXJ2ZXIgew0KICAgICAgICBsaXN0ZW4gICAgICAgODA7DQogICAgICAgIHNlcnZlcl9uYW1lICBsb2NhbGhvc3Q7DQoNCiAgICAgICAgI2NoYXJzZXQga29pOC1yOw0KDQogICAgICAgICNhY2Nlc3NfbG9nICBsb2dzL2hvc3QuYWNjZXNzLmxvZyAgbWFpbjsNCg0KICAgICAgICBsb2NhdGlvbiAvbWV0YWRhdGEgew0KICAgICAgICAgICAgcHJveHlfcGFzcyBodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhOw0KICAgICAgICB9DQoNCiAgICAgICAgbG9jYXRpb24gLyB7DQogICAgICAgICAgICByb290ICAgaHRtbDsNCiAgICAgICAgICAgIGluZGV4ICBpbmRleC5odG1sIGluZGV4Lmh0bTsNCiAgICAgICAgfQ0KDQogICAgICAgICNlcnJvcl9wYWdlICA0MDQgICAgICAgICAgICAgIC80MDQuaHRtbDsNCg0KICAgICAgICAjIHJlZGlyZWN0IHNlcnZlciBlcnJvciBwYWdlcyB0byB0aGUgc3RhdGljIHBhZ2UgLzUweC5odG1sDQogICAgICAgICMNCiAgICAgICAgZXJyb3JfcGFnZSAgIDUwMCA1MDIgNTAzIDUwNCAgLzUweC5odG1sOw0KICAgICAgICBsb2NhdGlvbiA9IC81MHguaHRtbCB7DQogICAgICAgICAgICByb290ICAgaHRtbDsNCiAgICAgICAgfQ0KDQogICAgfQ0KDQp9"
+    },
+    "script": {
+      "value": "IyEvYmluL3NoDQoNCmN1cmwgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlL2NvbXB1dGUvdXNlckRhdGE/YXBpLXZlcnNpb249MjAyMS0wMS0wMSZmb3JtYXQ9dGV4dCIgfCBiYXNlNjQgLS1kZWNvZGUgPiBuZ2lueC5jb25mDQoNCnN1ZG8gc3lzdGVtY3RsIHN0b3AgbmdpbngNCg0Kc3VkbyBkbmYgaW5zdGFsbCBuZ2lueCAteQ0KDQpzdWRvIGNwIG5naW54LmNvbmYgL2V0Yy9uZ2lueC9uZ2lueC5jb25mDQoNCnN1ZG8gc3lzdGVtY3RsIGVuYWJsZSBuZ2lueA0Kc3VkbyBzeXN0ZW1jdGwgc3RhcnQgbmdpbngNCnN1ZG8gaXB0YWJsZXMgLUEgSU5QVVQgLXAgdGNwIC0tZHBvcnQgODAgLW0gY29ubnRyYWNrIC0tY3RzdGF0ZSBORVcsRVNUQUJMSVNIRUQgLWogQUNDRVBUDQpzdWRvIGlwdGFibGVzIC1BIE9VVFBVVCAtcCB0Y3AgLS1zcG9ydCA4MCAtbSBjb25udHJhY2sgLS1jdHN0YXRlIEVTVEFCTElTSEVEIC1qIEFDQ0VQVA0K"
+    },
+    "revision": {
+      "value": 4
     }
+  }
 }

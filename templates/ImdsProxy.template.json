@@ -191,7 +191,6 @@
                 ]
             }
         },
-
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2024-03-01",
